@@ -3,12 +3,19 @@ import CategoryGridTitle from '../components/CategoryGridTitle';
 
 import { CATEGORIES } from './../data/dummy';
 
-function renderCategoryItem(itemData)
-{
-    return <CategoryGridTitle title={itemData.item.title} color={itemData.item.color}/>
-}
 
-function CatogoriesScreen() {
+
+
+function CatogoriesScreen({ navigation }) {
+    function renderCategoryItem(itemData) 
+{
+    function pressHanlder() {
+        navigation.navigate('MealsOverView', {
+            categoryId: itemData.item.id
+         });
+    }
+    return <CategoryGridTitle title={itemData.item.title} color={itemData.item.color} onPress={pressHanlder}/>
+}
     return <FlatList data={CATEGORIES} keyExtractor={(item) => item.id} renderItem={renderCategoryItem} numColumns={2}/>
 }
 
