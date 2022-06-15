@@ -1,26 +1,45 @@
 import { Text, Image, View, ScrollView} from "react-native";
 import { StyleSheet } from "react-native";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import List from "../components/MealDetail/List";
 import Subtitle from "../components/MealDetail/Subtitle";
 import MealDetails from "../components/MealDetails";
 import { MEALS } from "../data/dummy";
 import IconButton from "../components/IconButton";
+import { FavoritesContext } from "../store/context/favorite-context";
+import { useDispatch, useSelector } from "react-redux";
+import { addFavorite, removeFavorite } from "../store/redux/favorites";
 
 function MealDetailScreen({route, navigation}) {
-    function headerButtonPressHandler() {
-        console.log('pressed');
+    const favoriteMealsIds = useSelector((state) => state.favoriteMeals.ids);   
+    const dispatch = useDispatch(); 
+    // const favoriteMealsCtx = useContext(FavoritesContext)
+    const mealId = route.params.mealId;
+    const selectedMeal = MEALS.find((meal) => meal.id === mealId);
+
+    const mealsIsFavorite = favoriteMealsIds.includes(mealId);
+    function changeFavoriteStatusHandler() {
+        if (mealsIsFavorite) {
+            // favoriteMealsCtx.removeFavorite(mealId)
+            dispatch(removeFavorite({id: mealId}))
+        }
+        else {
+            dispatch(addFavorite({id: mealId}));
+            // favoriteMealsCtx.addFavorite(mealId);
+        }
     }
+
+    console.log(mealsIsFavorite);
+
     useLayoutEffect(() => {
       navigation.setOptions({
           headerRight: () =>{
-              return <IconButton color="white" onPress={headerButtonPressHandler} icon="star"/>
+              return <IconButton color="white" onPress={changeFavoriteStatusHandler} icon={mealsIsFavorite ? 'star':'star-outline'}/>
           }
       })
-    }, [navigation, headerButtonPressHandler])
-    const mealId = route.params.mealId;
-    const selectedMeal = MEALS.find((meal) => meal.id === mealId);
-    console.log(selectedMeal.ingredients)
+    }, [navigation, changeFavoriteStatusHandler])
+
+
     
     return (<ScrollView style={styles.rootContainer}>
         <Image style={styles.image} source={{uri: selectedMeal.imageUrl}}/>
